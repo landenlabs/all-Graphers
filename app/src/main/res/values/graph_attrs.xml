@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright © 2024 The Weather Company. All rights reserved.
+  -->
+<resources>
+
+    <declare-styleable name="ImageText">
+        <attr name="layout" format="reference" />
+        <attr name="text_id" format="reference" />
+        <attr name="image_id" format="reference" />
+        <attr name="empty_text_vis" format="enum">
+            <enum name="gone" value="8" />
+            <enum name="invisible" value="4" />
+            <enum name="visible" value="0" />
+        </attr>
+        <attr name="empty_image_vis" format="enum">
+            <enum name="gone" value="8" />
+            <enum name="invisible" value="4" />
+            <enum name="visible" value="0" />
+        </attr>
+        <attr name="android:text" />
+        <attr name="android:src" />
+        <attr name="android:checked" />
+    </declare-styleable>
+
+    <declare-styleable name="UiSet">
+        <attr name="layout" />
+        <attr name="styleOn" format="reference" />
+        <attr name="styleOff" format="reference" />
+        <attr name="text0" format="string" />
+        <attr name="text1" format="string" />
+        <attr name="text2" format="string" />
+        <attr name="text3" format="string" />
+        <attr name="text4" format="string" />
+        <attr name="text5" format="string" />
+        <attr name="image0" format="reference" />
+        <attr name="image1" format="reference" />
+        <attr name="image2" format="reference" />
+        <attr name="image3" format="reference" />
+        <attr name="image4" format="reference" />
+        <attr name="image5" format="reference" />
+        <attr name="android:checked" />
+    </declare-styleable>
+
+    <declare-styleable name="TextViewExt1">
+        <!--
+        <attr name="textStyle" format="integer" />
+        <attr name="typeface" format="reference" />
+        <attr name="fontFamily" format="string" />
+        <attr name="underline" format="boolean" />
+        -->
+        <attr name="clipBottom" format="dimension" />
+        <attr name="shadowRadius" format="dimension" />
+        <attr name="shadowColor" format="color" />
+        <attr name="markerColor" format="color" />
+        <attr name="marker" format="reference" />
+    </declare-styleable>
+
+    <attr name="CompatSeekBar" format="reference" />
+    <declare-styleable name="SeekBarExt1">
+        <attr name="tickMin" format="integer" />
+        <attr name="tickMax" format="integer" />
+        <attr name="tickStep" format="integer" />
+        <attr name="tickWidth" format="integer" />
+        <attr name="showTick" format="boolean" />
+        <attr name="tickColor" format="color" />
+        <attr name="tickUnder" format="boolean" />
+
+        <!-- Warning attribute "tickMark" is already used by SeekBar so use tickMarker -->
+        <attr name="tickMarker" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="AnimatedCells">
+        <attr name="borderId" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="ArcView">
+        <attr name="progress" format="float" />
+        <attr name="radiusPercent" format="float" />
+        <attr name="radius" format="dimension" />
+        <attr name="textSize" format="dimension" />
+        <attr name="progressFormat" format="string" />
+        <attr name="arcSweepDegrees" format="float" />
+        <attr name="arcStartDegrees" format="float" />
+        <attr name="arcWidth" format="dimension" />
+        <attr name="arcBgColor" format="color" />
+        <attr name="arcFgColor1" format="color" />
+        <attr name="arcFgColor2" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="GraphBarView">
+        <attr name="yScale" format="float" />
+        <attr name="barWidth" format="dimension" />
+        <attr name="barGap" format="dimension" />
+        <attr name="barRadius" format="dimension" />
+        <attr name="fillMinColor" format="color" />
+        <attr name="fillMaxColor" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="GraphLineView">
+        <attr name="fillMinColor" />
+        <attr name="fillMaxColor" />
+        <!--
+        <attr name="fillMinColor" format="color" />
+        <attr name="fillMaxColor" format="color" />
+        -->
+    </declare-styleable>
+</resources>
