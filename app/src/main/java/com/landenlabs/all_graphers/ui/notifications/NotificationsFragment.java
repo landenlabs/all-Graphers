@@ -1,7 +1,9 @@
 package com.landenlabs.all_graphers.ui.notifications;
 
 import static com.github.mikephil.charting.components.YAxis.AxisDependency.LEFT;
+import static com.github.mikephil.charting.components.YAxis.AxisDependency.RIGHT;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
@@ -14,8 +16,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -24,7 +26,6 @@ import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.MarkerView;
-import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
@@ -33,10 +34,12 @@ import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.MPPointF;
+import com.landenlabs.all_graphers.R;
 import com.landenlabs.all_graphers.databinding.FragmentNotificationsBinding;
+import com.landenlabs.all_graphers.ui.graphs.graphMP.Units;
 
 import org.joda.time.DateTime;
-import org.joda.time.Seconds;
+import org.joda.time.Interval;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -44,7 +47,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public class NotificationsFragment extends Fragment {
 
@@ -54,9 +56,7 @@ public class NotificationsFragment extends Fragment {
     private LineChart mpPlot;
     protected DateTime startTime = DateTime.now();
     protected final int lineOnlyWidth = 3;    // TODO use DP
-    protected final int lineFillWidth = 3;    // TODO use DP
     protected final Map<Integer, String> legendName = new HashMap<>();
-    protected int mult = 1;   // 1= min & max together, 2=separate
     // End Graph
 
     //region [createView] --------------------------------------------------------------------------
@@ -74,6 +74,7 @@ public class NotificationsFragment extends Fragment {
 
         mpPlot = binding.mpchart;
         setupChart();
+        addRandomValues();
 
         return root;
     }
@@ -84,6 +85,17 @@ public class NotificationsFragment extends Fragment {
         binding = null;
     }
     //endregion
+
+
+    private float getRandom(float minV, float maxV) {
+        return (float)(Math.random() * (maxV-minV) + minV);
+    }
+    private float getRandom1(int x) {
+        return getRandom(-40, 100);
+    }
+    private float getRandom2(int x) {
+        return getRandom(0, 100);
+    }
 
     //region [Graph] -------------------------------------------------------------------------------
     protected final DateTimeFormatter yAxisHourFmt = DateTimeFormat.forPattern("ha");
@@ -128,15 +140,14 @@ public class NotificationsFragment extends Fragment {
         mpPlot.getXAxis().setTextSize(AXIS_TEXT_SIZE);
         mpPlot.getXAxis().setLabelRotationAngle(90);
 
+        Units.SampleBy sampleBy = Units.SampleBy.Hours;
+
         mpPlot.getXAxis().setValueFormatter(new ValueFormatter() {
             @Override
             public String getAxisLabel(float value, AxisBase axis) {
-                if (sampleBy == Units.SampleBy.Hours) {
+                {
                     DateTime dt1 = startTime.plusHours((int) value);
                     return yAxisHourFmt.print(dt1);
-                } else {
-                    DateTime dt1 = startTime.plusDays((int) value);
-                    return yAxisDayFmt.print(dt1);
                 }
             }
         });
@@ -148,13 +159,6 @@ public class NotificationsFragment extends Fragment {
         mpPlot.setMarker(mv);
     }
 
-    protected static Entry DayEntry(
-            int dayIdx, DateTime startTime, DeviceGoveeHelper.D2 rec, Function<DeviceGoveeHelper.D2, Float> getVal) {
-        DateTime dt = new DateTime(rec.milli);
-        int seconds = Seconds.secondsBetween(startTime, dt).getSeconds();
-        double days = seconds / (double) TimeUnit.DAYS.toSeconds(1);
-        return new Entry((float) days, getVal.apply(rec));
-    }
 
     protected static void normalizeAxis(
             @NonNull AxisBase axis, final int numLabels, final int STEP, @NonNull LineDataSet... sets) {
@@ -175,56 +179,6 @@ public class NotificationsFragment extends Fragment {
         axis.setAxisMinimum(yMin);
         axis.setAxisMaximum(yMax);
         axis.setLabelCount(numLabels, /*force: */true);
-    }
-
-    protected void addDayLine(@NonNull XAxis xAxis, int xPos, @NonNull String label, boolean bottom) {
-        final int ORANGE = 0xffFFA500;
-        @ColorInt int color = bottom ? Color.RED : ORANGE;
-        LimitLine limitLine = new LimitLine(xPos, label);
-        limitLine.setLineColor(color);
-        limitLine.setLineWidth(lineOnlyWidth / 2f);
-        //    ll1.enableDashedLine(10f, 10f, 0f);
-        limitLine.setLabelPosition(bottom
-                ? LimitLine.LimitLabelPosition.RIGHT_BOTTOM
-                : LimitLine.LimitLabelPosition.RIGHT_TOP
-        );
-        // limitLine.setLabelRotationAngle(-45);
-        limitLine.setTextSize(LABEL_TEXT_SIZE);
-        limitLine.setTextColor(color);
-        xAxis.addLimitLine(limitLine);
-    }
-
-    public void enableSeries(@NonNull Units.Sensors sensor, boolean show) {
-        if (mpPlot != null && mpPlot.getData() != null) {
-            if (mult == 1) {
-                if (enableSeries(sensor.ordinal(), show)) {
-                    mpPlot.invalidate();
-                }
-            } else {
-                boolean refresh;
-                refresh = enableSeries(sensor.ordinal() * 2, show);
-                refresh |= enableSeries(sensor.ordinal() * 2 + 1, show);
-                if (refresh)
-                    mpPlot.invalidate();
-            }
-        }
-    }
-
-    protected boolean enableSeries(int idx, boolean show) {
-        ILineDataSet set = mpPlot.getData().getDataSetByIndex(idx);
-        if (set != null && set.isVisible() != show) {
-            set.setVisible(show);
-            if (set.getAxisDependency() == LEFT) {
-                mpPlot.getAxisLeft().setEnabled(show);
-            } else {
-                mpPlot.getAxisRight().setEnabled(show);
-            }
-            if (legendName.containsKey(idx) && idx < mpPlot.getLegend().getEntries().length) {
-                mpPlot.getLegend().getEntries()[idx].label = show ? legendName.get(idx) : "";
-            }
-            return true;
-        }
-        return false;
     }
 
     protected void addSet(
@@ -264,11 +218,11 @@ public class NotificationsFragment extends Fragment {
 
             // set.setFormSize(axisTextSize);
 
-            /*
+
             set.setDrawCircles(true);
             set.setCircleRadius(5f);
             set.setDrawCircleHole(true);
-             */
+
 
             /*
             set.setValueTextSize(10f);
@@ -326,12 +280,12 @@ public class NotificationsFragment extends Fragment {
 
         // callbacks everytime the MarkerView is redrawn, can be used to update the
         // content (user-interface)
+        @SuppressLint("DefaultLocale")
         @Override
         public void refreshContent(@NonNull Entry e, @NonNull Highlight highlight) {
             // DateTime dt = getDateTimeForXAxis(e.getX(), interval, sampleBy);
             String xStr = xFormatter.getAxisLabel(e.getX(), xAxis);
-            tvContent.setText(String.format("%.1f\nat %s", e.getY(),
-                    xStr)); // set the entry-value as the display text
+            tvContent.setText(String.format("%.1f\nat %s", e.getY(), xStr)); // set the entry-value as the display text
             super.refreshContent(e, highlight);     // Perform necessary layouting
         }
 
@@ -342,4 +296,90 @@ public class NotificationsFragment extends Fragment {
         }
     }
     //endregion
+
+    private static final int TEMPERATURE_COLOR = Color.GREEN;
+    private static final int HUMIDITY_COLOR = 0xff8080ff;
+    private Drawable temperatureFillDrawable;
+    private Drawable humidityFillDrawable;
+
+    private void setupAxis() {
+        mpPlot.getAxisLeft().setTextColor(TEMPERATURE_COLOR);
+        mpPlot.getAxisLeft().setTextSize(AXIS_TEXT_SIZE);
+        mpPlot.getAxisLeft().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getAxisLabel(float value, AxisBase axis) {
+                return String.format("%.0f", value);
+            }
+        });
+        temperatureFillDrawable = ContextCompat.getDrawable(getContext(), R.drawable.graph_temperature_fill);
+
+        mpPlot.getAxisRight().setEnabled(true);
+        mpPlot.getAxisRight().setTextColor(HUMIDITY_COLOR);
+        mpPlot.getAxisRight().setTextSize(AXIS_TEXT_SIZE);
+        mpPlot.getAxisRight().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getAxisLabel(float value, AxisBase axis) {
+                return String.format("%.0f", value);
+            }
+        });
+        humidityFillDrawable = ContextCompat.getDrawable(getContext(), R.drawable.graph_humidity_fill);
+
+        // mpPlot.setDomainLabel("Hours");
+        // mpPlot.setRangeLabel("Temperature °F");
+
+        float freezeValue =   32F;
+        LimitLine freezeLine = new LimitLine(freezeValue, "Freezing");
+        freezeLine.setLineColor(Color.RED);
+        freezeLine.setLineWidth(lineOnlyWidth / 2f);
+        //    ll1.enableDashedLine(10f, 10f, 0f);
+        freezeLine.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
+        freezeLine.setTextSize(LABEL_TEXT_SIZE);
+        freezeLine.setTextColor(Color.RED);
+        mpPlot.getAxisLeft().removeAllLimitLines();
+        mpPlot.getAxisLeft().addLimitLine(freezeLine);
+    }
+
+    void addRandomValues( ) {
+        int numSamples = 36;
+        Interval interval = new Interval(DateTime.now().getMillis(), DateTime.now().plusHours(numSamples).getMillis());
+
+        setupAxis();
+
+        // Populate Graph with uniform hourly offsets, handling missing data correctly.
+        // Get "start of day" positions for later addition of Xaxis vertical lines.
+        ArrayList<Entry> temSeries = new ArrayList<>(numSamples);
+        ArrayList<Entry> humSeries = new ArrayList<>(numSamples);
+        DateTime startDT = interval.getStart();
+
+        for (int dataIdx = 0; dataIdx < numSamples; dataIdx++) {
+            // Add data at hourly spacing
+            temSeries.add(new Entry(dataIdx, getRandom1(dataIdx)));
+            humSeries.add(new Entry(dataIdx, getRandom2(dataIdx)));
+        }
+
+        addSet("Temperature °F", temSeries, TEMPERATURE_COLOR, null /* temperatureFillDrawable */ , LEFT, 0);
+        addSet("Humidity", humSeries, HUMIDITY_COLOR, humidityFillDrawable, RIGHT, 1);
+
+        // Add dummy series to force gap on right edge
+        float freezeValue =  32F ;
+        ArrayList<Entry> dummySeries = new ArrayList<>(2);
+        dummySeries.add(new Entry(0, freezeValue));
+        dummySeries.add(new Entry(temSeries.size()+2, freezeValue));
+        addSet("", dummySeries, Color.TRANSPARENT, null, LEFT, 2);
+
+        mpPlot.getXAxis().removeAllLimitLines();
+
+        LineDataSet set0 = (LineDataSet) mpPlot.getData().getDataSetByIndex(0);
+        LineDataSet set1 = (LineDataSet) mpPlot.getData().getDataSetByIndex(1);
+        // set0.calcMinMax();
+
+        final int NUM_LABELS = 6;
+        normalizeAxis(mpPlot.getAxisLeft(), NUM_LABELS, 5, set0);
+        normalizeAxis(mpPlot.getAxisRight(), NUM_LABELS, 10, set1);
+
+        mpPlot.getData().notifyDataChanged();
+        mpPlot.notifyDataSetChanged();
+        mpPlot.invalidate();
+    }
+
 }

@@ -2,7 +2,7 @@
  * Copyright © 2024 The Weather Company. All rights reserved.
  */
 
-package com.landenlabs.all_graphers.ui.graph;
+package com.landenlabs.all_graphers.ui.graphs.graphLL.notused;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -24,6 +24,8 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
 import com.landenlabs.all_graphers.R;
+import com.landenlabs.all_graphers.ui.graphs.graphLL.CubicSplineF;
+import com.landenlabs.all_graphers.ui.graphs.graphLL.GraphBaseView;
 
 import java.util.ArrayList;
 
@@ -31,27 +33,35 @@ import java.util.ArrayList;
 /**
  * Draw simple line graph with optional circular markers.
  */
-public class GraphLineView extends GraphBaseView {
+public class GraphLineView3 extends GraphBaseView {
 
     public boolean isSmooth = true;
     private final static int DARKEN_ALPHA = 128;
+
+    private final ArrayList<PointF> rawPoints = new ArrayList<>();
     public final Paint linePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Path linePath = new Path();
     private final Matrix lineMatrix = new Matrix();
+
     public final Paint areaPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Path areaPath = new Path();
+
     public final Paint markPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final ArrayList<PointF> markPoints = new ArrayList<>();
-    private final Paint darkenPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final PorterDuffXfermode clear = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
     private final PorterDuffXfermode mult = new PorterDuffXfermode(PorterDuff.Mode.MULTIPLY);
     private boolean firstDraw = true;
     private float scaleX;
     private float scaleY;
     public float markRadius = 24;
+
+    private final Paint darkenPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private RectF darkenMaskRect;
     private boolean darkenMaskIsPercent;
+
     private float mCurX = 0f;
+    private float minX = Float.POSITIVE_INFINITY;
+    private float maxX = Float.NEGATIVE_INFINITY;
     private float mCurY = 0f;
     private float minY = Float.POSITIVE_INFINITY;
     private float maxY = Float.NEGATIVE_INFINITY;
@@ -61,22 +71,22 @@ public class GraphLineView extends GraphBaseView {
     private float padHeight = 0f;
 
     private int lineColor = Color.WHITE;
-    private int fillStartColor = Color.WHITE;
-    private int fillEndColor = Color.TRANSPARENT;
+    private int fillStartColor = Color.TRANSPARENT;
+    private int fillEndColor = Color.WHITE;
 
-    public GraphLineView(Context context) {
+    public GraphLineView3(Context context) {
         super(context);
         init(context, null, 0);
     }
 
     // ---------------------------------------------------------------------------------------------
 
-    public GraphLineView(@NonNull Context context, AttributeSet attrs) {
+    public GraphLineView3(@NonNull Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context, attrs, 0);
     }
 
-    public GraphLineView(@NonNull Context context, AttributeSet attrs, int defStyleAttr) {
+    public GraphLineView3(@NonNull Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context, attrs, defStyleAttr);
     }
@@ -98,10 +108,9 @@ public class GraphLineView extends GraphBaseView {
         linePaint.setColor(lineColor);
         linePaint.setStyle(Paint.Style.STROKE);
         linePaint.setStrokeWidth(context.getResources().getDimension(R.dimen.graph_line_width));     // 6.0fShould use Dimension res to scale by density.
-        //linePaint.setAntiAlias(true);
 
         areaPaint.setStyle(Paint.Style.FILL);
-        //areaPaint.setAntiAlias(true);
+        areaPaint.setAntiAlias(true);
 
         markPaint.setColor(Color.WHITE);
         // markPaint.setAntiAlias(true);
@@ -128,9 +137,10 @@ public class GraphLineView extends GraphBaseView {
         super.onDetachedFromWindow();
     }
 
+
     @Override
     protected void onDraw(Canvas canvas) {
-        // super.onDraw(canvas);
+        super.onDraw(canvas);
 
         if (firstDraw && getHeight() > 0) {
             firstDraw = false;
@@ -147,12 +157,17 @@ public class GraphLineView extends GraphBaseView {
             lineMatrix.postScale(1, -1, getWidth() / 2f, getHeight() / 2f);
             linePath.transform(lineMatrix);
 
-
             areaPath.transform(lineMatrix);
             // height only available after layout completes.
             Shader shadow = new LinearGradient(
+                    /* shade increases with height
                     0, 0,
-                    0, getHeight(),     // height only available after layout completes.
+                    0, getHeight(),     // intensity increases along y-axis
+                     */
+
+                    0, 0,           // intensity increases along x-axis
+                    getWidth(), 0,
+
                     fillStartColor, fillEndColor,
                     Shader.TileMode.CLAMP);
             areaPaint.setShader(shadow);
@@ -165,14 +180,13 @@ public class GraphLineView extends GraphBaseView {
             }
 
             if (darkenMaskRect != null) {
-                // Currently PorterDuff xfer only works if hardware accelleration is disabled !
+                // Currently PorterDuff xfer only works if hardware acceleration is disabled !
                 setLayerType(View.LAYER_TYPE_SOFTWARE, null);
                 darkenPaint.setColor(lineColor);
                 darkenPaint.setAlpha(DARKEN_ALPHA);
             }
         }
-
-        canvas.drawPath(areaPath, areaPaint);
+    //zz    canvas.drawPath(areaPath, areaPaint);
 
         if (darkenMaskRect != null) {
             darkenPaint.setXfermode(clear);
@@ -208,31 +222,55 @@ public class GraphLineView extends GraphBaseView {
     }
 
     public void setStart(float x, float y) {
-        linePath.moveTo(x, y);
+        if (isSmooth) {
+            rawPoints.clear();
+            rawPoints.add(new PointF(x, y));
+        } else {
+            linePath.moveTo(x, y);
+        }
         mCurX = x;
         mCurY = y;
         minY = maxY = y;
+        minX = maxX = x;
     }
 
     public void addPoint(float x, float y) {
         if (isSmooth) {
-            linePath.quadTo(mCurX, mCurY, x, y);
+            rawPoints.add(new PointF(x, y));
+            // linePath.quadTo(mCurX, mCurY, x, y);
             // linePath.quadTo(mCurX, mCurY, (x*3 + mCurX) / 4, (y*3 + mCurY) / 4);
             // linePath.quadTo(mCurX, mCurY, (x*3 + mCurX) / 4, (y*3 + mCurY) / 4);
             // linePath.quadTo(mCurX, mCurY, (x + mCurX) / 2, (y + mCurY) / 2);
             // linePath.quadTo(x,y, x, y);
             // linePath.quadTo((x + mCurX) / 2, (y + mCurY) / 2, x, y);
         } else
-            linePath.lineTo(mCurX, mCurY);
+            linePath.lineTo(x, y);
 
         mCurX = x;
+        minX = Math.min(minX, x);
+        maxX = Math.max(maxX, x);
         mCurY = y;
         minY = Math.min(minY, y);
         maxY = Math.max(maxY, y);
     }
 
     public void setEnd() {
-        linePath.lineTo(mCurX, mCurY);
+        if (isSmooth) {
+            linePath.reset();
+            ArrayList<PointF> splinedPoints = new ArrayList<>();
+            CubicSplineF.splinePointFs(rawPoints, splinedPoints);
+            PointF pt1 = splinedPoints.get(0);
+            linePath.moveTo(pt1.x, pt1.y);
+            for (int idx = 1; idx < splinedPoints.size(); idx++) {
+                pt1 = splinedPoints.get(idx);
+                    // Clamp spline line to original data range.
+                if (pt1.x >= minX && pt1.x <= maxX) {
+                    linePath.lineTo(pt1.x, pt1.y);
+                }
+            }
+        } else {
+            linePath.lineTo(mCurX, mCurY);
+        }
 
         if (!Float.isInfinite(userMinY))
             minY = userMinY;
@@ -240,22 +278,33 @@ public class GraphLineView extends GraphBaseView {
             maxY = userMaxY;
 
         // Close line path to form area path, used for shading.
-        areaPath.reset();
+
+        areaPath.rewind();
         areaPath.addPath(linePath);
+        /* area snap to x-axis
         areaPath.lineTo(mCurX, minY - 1);
         areaPath.lineTo(0, minY - 1);
+         */
+        // Area snap to y-axis
+        areaPath.lineTo(0, mCurY);
+        areaPath.lineTo(0, maxY);
         areaPath.close();
+
         firstDraw = true;
+        invalidate();
     }
 
     public void addMarker(float x, float y) {
         markPoints.add(new PointF(x, y));
     }
 
+    public boolean hasPoints() {
+        return isSmooth && !rawPoints.isEmpty();
+    }
     public void clear() {
         firstDraw = true;
-        linePath.reset();
-        areaPath.reset();
+        linePath.rewind();
+        areaPath.rewind();
     }
 
     @Override

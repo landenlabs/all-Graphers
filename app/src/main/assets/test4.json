@@ -1,0 +1,53 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -94.909,
+              49.101
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "id": "KCI_Z_171445_2",
+      "properties": {
+        "upper_level": "FL150",
+        "fir_ids": [
+          "CZWG",
+          "KZMP"
+        ],
+        "validTime": 1742230080000,
+        "expire_at": "2025-03-17T18:00:00+00:00"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -132.69,
+              54.66
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "id": "JNU_S_171158_6",
+      "properties": {
+        "upper_level": null,
+        "fir_ids": [
+          "CZVR",
+          "PAZA"
+        ],
+        "validTime": 1742230080000,
+        "expire_at": "2025-03-17T20:15:00+00:00"
+      },
+      "type": "Feature"
+    }
+  ]
+}

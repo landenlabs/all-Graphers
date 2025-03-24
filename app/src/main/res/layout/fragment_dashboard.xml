@@ -1,22 +1,190 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/bg_border_green"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.dashboard.DashboardFragment">
 
     <TextView
         android:id="@+id/text_dashboard"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:text="--Graph LL--"
         android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textSize="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/graph_norm_cb"
+        />
+
+    <TextView
+        android:id="@+id/graph_norm_title"
+        android:layout_marginStart="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Normalize X:"
+        android:textAlignment="center"
+        android:textSize="20dp"
+        app:layout_constraintStart_toEndOf="@+id/text_dashboard"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/graph_norm_cb"
+        />
+    <CheckBox
+        android:layout_marginStart="10dp"
+        android:id="@+id/graph_norm_cb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@+id/graph_norm_title"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/graph_data"
+        />
+
+    <RadioGroup
+        android:id="@+id/graph_data"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/graph_norm_cb"
+        app:layout_constraintBottom_toTopOf="@+id/vgraph_holder"
+        >
+        <RadioButton
+            android:id="@+id/graph_data_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Data #1"
+            />
+        <RadioButton
+            android:id="@+id/graph_data_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="#2"
+            />
+        <RadioButton
+            android:id="@+id/graph_data_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="#3"
+            />
+        <RadioButton
+            android:id="@+id/graph_data_4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="#4"
+            />
+    </RadioGroup>
+
+    <ScrollView
+        android:id="@+id/vgraph_holder"
+        android:fillViewport="true"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_border_blue"
+        android:paddingHorizontal="16dp"
+
+        app:layout_constraintBottom_toTopOf="@+id/vgraph_xaxis"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/graph_data"
+        app:layout_constraintVertical_weight="1">
+
+     <androidx.constraintlayout.widget.ConstraintLayout
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:clipChildren="false"
+         android:paddingHorizontal="10dp"
+         android:tag="insideScroll"
+         tools:layout_height="200dp"
+         tools:layout_width="match_parent">
+
+         <GridLayout
+             android:background="@drawable/bg_border_blue"
+             android:id="@+id/vgraph_yaxis_bg"
+             android:layout_width="0dp"
+             android:layout_height="wrap_content"
+             android:layout_margin="0dp"
+             android:columnCount="2"
+             android:padding="0dp"
+             android:useDefaultMargins="false"
+
+             app:layout_constraintBottom_toBottomOf="parent"
+             app:layout_constraintEnd_toEndOf="parent"
+             app:layout_constraintStart_toStartOf="parent"
+             app:layout_constraintTop_toTopOf="parent"
+             app:layout_constraintVertical_chainStyle="spread" />
+
+
+            <com.landenlabs.all_graphers.ui.graphs.graphLL.GraphLineView
+                android:id="@+id/vgraph_chart"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="@dimen/yLabelWidth"
+                android:layout_marginEnd="10dp"
+                android:clipToOutline="false"
+                app:layout_constraintBottom_toBottomOf="@+id/vgraph_yaxis_bg"
+                app:layout_constraintEnd_toEndOf="@+id/vgraph_yaxis_bg"
+                app:layout_constraintStart_toStartOf="@+id/vgraph_yaxis_bg"
+                app:layout_constraintTop_toTopOf="@+id/vgraph_yaxis_bg" />
+
+      </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+<!--
+    <GridLayout
+        android:background="#80f0"
+        android:id="@+id/vgraph_xaxis"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:useDefaultMargins="false"
+        android:padding="0dp"
+        app:layout_constraintStart_toStartOf="@+id/vgraph_holder"
+        app:layout_constraintTop_toBottomOf="@+id/vgraph_holder"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/vgraph_holder"
+        />
+-->
+
+    <LinearLayout
+        android:id="@+id/vgraph_xaxis"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:paddingTop="8dp"
+        android:useDefaultMargins="false"
+        app:layout_constraintBottom_toTopOf="@+id/vgraph_bottom_title"
+        app:layout_constraintEnd_toEndOf="@+id/vgraph_holder"
+        app:layout_constraintStart_toStartOf="@+id/vgraph_holder"
+        app:layout_constraintTop_toBottomOf="@+id/vgraph_holder"
+        tools:layout_height="50dp" />
+
+    <com.landenlabs.all_graphers.ui.graphs.graphLL.GraphPathView
+        android:id="@+id/vgraph_xaxis_colorbar"
+        android:layout_width="0dp"
+        android:layout_height="6dp"
+        app:layout_constraintEnd_toEndOf="@+id/vgraph_holder"
+        app:layout_constraintStart_toStartOf="@+id/vgraph_holder"
+        app:layout_constraintTop_toTopOf="@+id/vgraph_xaxis"
+        />
+
+    <TextView
+        android:id="@+id/vgraph_bottom_title"
+        style="@style/text16"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center_horizontal|top"
+        android:gravity="center_horizontal|top"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_min="25dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/vgraph_xaxis"
+        tools:background="#200"
+        tools:text="Ice Probability %" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

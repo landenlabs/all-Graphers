@@ -8,12 +8,15 @@ android {
 
     defaultConfig {
         applicationId "com.landenlabs.all_graphers"
-        minSdk 24
+        minSdk 28
         targetSdk 35
         versionCode 1
         versionName "1.0"
 
+        testApplicationId "com.landenlabs.test.A_TestJson1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testHandleProfiling true
+        testFunctionalTest true
     }
 
     buildTypes {
@@ -33,6 +36,7 @@ android {
 
 dependencies {
 
+    implementation libs.annotation
     implementation libs.appcompat
     implementation libs.material
     implementation libs.constraintlayout
@@ -46,13 +50,38 @@ dependencies {
         // http://halfhp.github.io/androidplot/docs/release_notes.html
         // exclude group: 'com.android.support', module: 'support-annotations'
     }
+
     implementation libs.mpandroidchart   // https://github.com/PhilJay/MPAndroidChart/releases
 
     // Support libs
     implementation libs.converter.gson
     implementation libs.android.joda
 
-    testImplementation libs.junit
-    androidTestImplementation libs.ext.junit
-    androidTestImplementation libs.espresso.core
+    testImplementation libs.annotation
+    testImplementation libs.test.junit
+
+    androidTestImplementation libs.annotation
+    androidTestImplementation libs.test.ext.junit
+    androidTestImplementation libs.test.espresso.core
+
+    // Core library
+    androidTestImplementation libs.test.core
+    // AndroidJUnitRunner and JUnit Rules
+    androidTestImplementation libs.test.runner
+    androidTestImplementation libs.test.rules
+    // Assertions
+    androidTestImplementation libs.test.ext.junit
+    androidTestImplementation libs.test.truth
+    androidTestImplementation libs.test.google.truth
+    // androidTestImplementation libs.test.jmh.core
+    // androidTestImplementation libs.test.jmh.generator.annprocess
+
+    testImplementation libs.test.assertj.core
+    testImplementation libs.test.robolectric
+    testImplementation libs.mockito.core
+    testImplementation libs.test.core
+    testImplementation libs.test.joda.time
+
+    // testImplementation libs.test.jmh.core
+    // testImplementation libs.test.jmh.generator.annprocess
 }

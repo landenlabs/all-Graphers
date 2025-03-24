@@ -4,29 +4,10 @@
   ~ Copyright © 2024 The Weather Company. All rights reserved.
   -->
 <resources>
-    <dimen name="card_row_height">60dp</dimen>
-    <dimen name="card_hourly_icon_dim">44dp</dimen>
-
-    <dimen name="grid_v_divider">2dp</dimen>
-    <dimen name="grid_h_divider">2dp</dimen>
-    <dimen name="grid_v_divider_pad_top">10dp</dimen>
-
-    <dimen name="graph_line_width">1.5dp</dimen>
-    <dimen name="graph_line_radius">4.0dp</dimen>
+    <dimen name="graph_line_width">3.0dp</dimen>
+    <dimen name="graph_line_radius">5.0dp</dimen>
 
     <dimen name="graph_bar_width">16dp</dimen>
     <dimen name="graph_bar_gap">8dp</dimen>
 
-    <dimen name="graph_lbl_extra_space">36dp</dimen>
-
-    <dimen name="card_margin_bottom">16dp</dimen>
-    <dimen name="card_padding">10dp</dimen>
-    <dimen name="card_padding_quad">2dp</dimen>
-    <dimen name="card_margin">30dp</dimen>
-    <dimen name="page_margin">30dp</dimen>
-
-    <!-- Map settings page hacks -->
-    <dimen name="radius50">50dp</dimen>
-    <dimen name="size340">340</dimen>
-    <dimen name="size200">200</dimen>
 </resources>

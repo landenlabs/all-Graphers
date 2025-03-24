@@ -14,6 +14,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.landenlabs.all_graphers.databinding.ActivityMainBinding;
+import com.landenlabs.test.App_TestJson1;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(binding.navView, navController);
 
         AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_YES);
-    }
 
+        App_TestJson1 testJson1 = new App_TestJson1(getApplicationContext());
+        testJson1.test1();
+    }
 }

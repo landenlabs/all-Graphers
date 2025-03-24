@@ -1,0 +1,84 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          [
+              [
+                -156.01,
+                19.638
+              ],
+              [
+                -156.008,
+                19.638
+              ],
+              [
+                -156.009,
+                19.638
+              ],
+              [
+                -156.009,
+                19.639
+              ],
+              [
+                -156.01,
+                19.638
+              ]
+          ],
+          [
+              [
+                -2.0,
+                19.184
+              ],
+              [
+                -2.0,
+                19.184
+              ]
+          ],
+          [
+              [
+                -3.0,
+                21.173
+              ],
+              [
+                -156.891,
+                21.173
+              ],
+              [
+                -3.0,
+                21.173
+              ]
+            ]
+        ],
+        "type": "Polygon"
+      },
+      "id": "HNL_S_171510_2",
+      "properties": {
+        "upper_level": null,
+        "phenomenon": "VIS",
+        "raw_type": "SHRA",
+        "continuation_time": "2025-03-17T22:00:00+00:00",
+        "active_at": "2025-03-17T16:00:00+00:00",
+        "icao_site_id": null,
+        "issue_time": "2025-03-17T15:10:00+00:00",
+        "clusterCount": 1,
+        "issuing_station": "PHFO",
+        "airmet_category": "S",
+        "moving_speed": null,
+        "type": "IFR",
+        "lower_level": "FL020",
+        "fir_ids": [
+          "KZAK",
+          "PHZH"
+        ],
+        "validTime": 1742230080000,
+        "moving_dir": null,
+        "airmet_id": null,
+        "data": "HNLS WA 171600 \nAIRMET SIERRA UPDATE 4 FOR IFR VALID UNTIL 172200\nAIRMET MTN OBSC...MOLOKAI LANAI MAUI BIG ISLAND.\nN THRU SE SECTIONS.\nTEMPO MTN OBSC ABV 020 EXP DUE TO CLD AND SHRA.\nCOND CONT BEYOND 2200Z",
+        "expire_at": "2025-03-17T22:00:00+00:00"
+      },
+      "type": "Feature"
+    }
+  ]
+}

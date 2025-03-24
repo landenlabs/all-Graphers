@@ -2,4 +2,8 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="yLabelWidth">60dp</dimen>
+
+    <dimen name="rowHeight">20dp</dimen>        <!-- was 60 -->
+    <dimen name="rowHalfHeight">10dp</dimen>    <!-- was 30 -->
 </resources>

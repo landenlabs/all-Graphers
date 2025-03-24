@@ -2,7 +2,7 @@
  * Copyright © 2024 The Weather Company. All rights reserved.
  */
 
-package com.landenlabs.all_graphers.ui.graph;
+package com.landenlabs.all_graphers.ui.graphs.graphLL.notused;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -21,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.landenlabs.all_graphers.R;
+import com.landenlabs.all_graphers.ui.data.UiUtils;
 
 /**
  * Custom View draws an animated arc with text in the middle.
@@ -32,8 +33,8 @@ public class ArcView extends View {
 
     private float radius = -1; // Utils.dpToPixel(80);
     private float radiusPercent = 0.90f;
-    private int txtSize = (int) UtilsUi.dpToPixel(40);
-    private int arcWidth = (int) UtilsUi.dpToPixel(15);
+    private int txtSize = (int) UiUtils.dpToPixel(40);
+    private int arcWidth = (int) UiUtils.dpToPixel(15);
 
     @ColorInt private int arcBgColor = 0x3dffffff; // R.color.white5
     @ColorInt private int arcFgColor1 = 0x80800000;

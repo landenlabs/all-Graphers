@@ -1,0 +1,49 @@
+<!--
+  ~ Copyright © 2024 The Weather Company. All rights reserved.
+  -->
+<resources>
+
+    <style name="font_default">
+        <item name="android:textColor">#fff</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <style name="text24" parent="font_default">
+        <item name="android:textSize">24dp</item>
+    </style>
+    <style name="text20" parent="font_default">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textSize">20dp</item>
+    </style>
+    <style name="text18" parent="font_default">
+        <item name="android:textSize">18dp</item>
+    </style>
+    <style name="text16" parent="font_default">
+        <item name="android:textSize">16dp</item>
+    </style>
+
+    <style name="text14" parent="font_default">
+        <item name="android:textSize">14dp</item>
+    </style>
+    <style name="text12" parent="font_default">
+        <item name="android:textSize">12dp</item>
+    </style>
+
+    <style name="vgraphXaxis" parent="font_default">
+        <item name="android:textSize">18dp</item>
+        <item name="android:textColor">#ccc</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textFontWeight">500</item>
+        <item name="android:gravity">center</item>
+
+        <!-- LinearLayout -->
+        <item name="android:layout_weight">1</item>
+
+        <!-- Grid Layout
+        <item name="android:layout_columnWeight">1</item>
+        -->
+    </style>
+
+</resources>
