@@ -8,6 +8,7 @@ import com.landenlabs.test.Data.PolyItems;
 import com.landenlabs.test.Data.SunVectorDataI;
 import com.landenlabs.test.Data.WLatLng;
 import com.landenlabs.test.JsonDennis.JsonReader;
+import com.landenlabs.test.JsonStream1.SunVectorBuilder;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -82,16 +83,16 @@ public class TestJson1 {
             com.landenlabs.test.JsonStream1.SunVectorData vdata3 = null;
             if (false) {
                 for (int idx = 0; idx < CNT; idx++) {
-                    vdata3 = com.landenlabs.test.JsonStream1.SunVectorData.parse(jsonStr);
+                    vdata3 = SunVectorBuilder.parse(jsonStr);
                     total += vdata3.items.size();
                 }
             } else {
                 for (int idx = 0; idx < CNT; idx++) {
-                    vdata3 = com.landenlabs.test.JsonStream1.SunVectorData.parse(jsonBytes);
+                    vdata3 = SunVectorBuilder.parse(jsonBytes);
                     total += vdata3.items.size();
                 }
             }
-            com.landenlabs.test.JsonStream1.SunVectorData.release();
+            SunVectorBuilder.release();
             stmDelta = showMemory(String.format("Stream VectorData size=%,d", total)).deltaMilli;
 
             /*

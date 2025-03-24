@@ -190,5 +190,4 @@ public class JsonStreamString implements JsonStream {
             idx++;
         }
     }
-
 }

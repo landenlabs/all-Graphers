@@ -7,6 +7,7 @@ import com.landenlabs.all_graphers.ui.logger.ALog;
 import com.landenlabs.test.Data.PolyItems;
 import com.landenlabs.test.Data.SunVectorDataI;
 import com.landenlabs.test.Data.WLatLng;
+import com.landenlabs.test.JsonStream1.SunVectorBuilder;
 
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -83,16 +84,16 @@ public class App_TestJson1 {
         System.out.println("Start");
         try {
             int total;
-            String json = loadAssetFile("test3.json");
+            String jsonStr = loadAssetFile("test3.json");
             initMemory();
 
-            com.landenlabs.test.JsonDennis.JsonReader reader = new com.landenlabs.test.JsonDennis.JsonReader(json, true);
+            com.landenlabs.test.JsonDennis.JsonReader reader = new com.landenlabs.test.JsonDennis.JsonReader(jsonStr, true);
             showMemory("JsonReader");
 
             total = 0;
             com.landenlabs.test.JsonDennis.SunVectorData vdata1 = null;
             for (int idx = 0; idx < CNT; idx++) {
-                vdata1 = com.landenlabs.test.JsonDennis.SunVectorData.parse(json);
+                vdata1 = com.landenlabs.test.JsonDennis.SunVectorData.parse(jsonStr);
                 total += vdata1.items.size();
             }
             denDelta = showMemory(String.format("Den VectorData size=%,d", total)).deltaMilli;
@@ -100,7 +101,7 @@ public class App_TestJson1 {
             total = 0;
             com.landenlabs.test.JsonOrg.SunVectorData vdata2 = null;
             for (int idx = 0; idx < CNT; idx++) {
-                vdata2 = com.landenlabs.test.JsonOrg.SunVectorData.parse(json);
+                vdata2 = com.landenlabs.test.JsonOrg.SunVectorData.parse(jsonStr);
                 total += vdata2.items.size();
             }
             stdDelta = showMemory(String.format("Org VectorData size=%,d", total)).deltaMilli;
@@ -108,10 +109,10 @@ public class App_TestJson1 {
             total = 0;
             com.landenlabs.test.JsonStream1.SunVectorData vdata3 = null;
             for (int idx = 0; idx < CNT; idx++) {
-                vdata3 = com.landenlabs.test.JsonStream1.SunVectorData.parse(json);
+                vdata3 = SunVectorBuilder.parse(jsonStr);
                 total += vdata3.items.size();
             }
-            com.landenlabs.test.JsonStream1.SunVectorData.release();
+            SunVectorBuilder.release();
             stmDelta = showMemory(String.format("Stream VectorData size=%,d", total)).deltaMilli;
 
             if ( !vdata1.equals(vdata2) ) {
