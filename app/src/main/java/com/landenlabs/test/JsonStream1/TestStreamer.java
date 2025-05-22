@@ -95,7 +95,7 @@ public class TestStreamer {
             System.out.printf("  json length=%,d \n\n", json.length());
 
             initMemory();
-            SunVectorData vectorData = SunVectorBuilder.parse(json);
+            SunVectorData vectorData = new SunVectorBuilder().parse(json);
             showMemory("testStreamer items=" + (vectorData.items.size()));
 
         } catch (Exception ex) {

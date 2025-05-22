@@ -13,15 +13,15 @@ import java.util.ArrayList;
 public class SunVectorBuilder   {
     public ArrayList<Item> items;
 
-    private static ArrayList<Item> workingItems;
-    private static ArrayList<GeoPolygon> polygons;
-    private static ArrayList<WLatLng> coords;
+    private ArrayList<Item> workingItems;
+    private ArrayList<GeoPolygon> polygons;
+    private ArrayList<WLatLng> coords;
 
-    private static String type = "";
-    private static String geoType = "";
-    private static WLatLng wlatLng;
-    private static int arrayDepth = 0;
-    private static Properties prop;
+    private String type = "";
+    private String geoType = "";
+    private WLatLng wlatLng;
+    private int arrayDepth = 0;
+    private Properties prop;
 
     // ---------------------------------------------------------------------------------------------
 
@@ -29,16 +29,16 @@ public class SunVectorBuilder   {
         System.err.printf("Failed at %d, msg=%s\n", pos, msg);
     }
 
-    private static void onFeature(JsonStream streamer, String name, Object value, int typeIdx) {
+    private void onFeature(JsonStream streamer, String name, Object value, int typeIdx) {
         if (JsonStreamString.START_ARRAY == value && "coordinates".equals(name)) {
-            streamer.push(SunVectorBuilder::onCoordinates, "onCoord");
+            streamer.push(this::onCoordinates, "onCoord");
             arrayDepth = 0; // not balanced, startArray is one less than endArray, must reset manually.
             maxArrayDepth = 10;  // Set to large value so comparison fails unless initialized correctly.
             polygons.clear();
         } else if (JsonStreamString.START_MAP == value && "properties".equals(name)) {
             geoType = type;
             prop = new Properties();
-            streamer.push(SunVectorBuilder::onProperties1, "onProp");
+            streamer.push(this::onProperties1, "onProp");
         } else if (name.equals("type") && typeIdx == JsonStreamString.T_MAP) {
             type = toString(value);
         } else if (JsonStreamString.END_ARRAY == value) {
@@ -57,8 +57,8 @@ public class SunVectorBuilder   {
         return (obj == null) ? "null" : obj.getClass().getSimpleName();
     }
 
-    private static int maxArrayDepth = 10;
-    private static void onCoordinates(JsonStream streamer, String name, Object value, int typeIdx) {
+    private  int maxArrayDepth = 10;
+    private  void onCoordinates(JsonStream streamer, String name, Object value, int typeIdx) {
         // System.out.printf("%d: %s", streamer.getLevel(), " ".repeat(streamer.getLevel()));
         if (JsonStreamString.START_MAP == value) {
             // System.out.println("Start map");
@@ -115,7 +115,7 @@ public class SunVectorBuilder   {
     }
 
 
-    private static void onProperties1(JsonStream streamer, String name, Object value, int typeIdx) {
+    private  void onProperties1(JsonStream streamer, String name, Object value, int typeIdx) {
         if (JsonStreamString.START_MAP == value) {
             prop = new Properties();
         } else if (JsonStreamString.END_MAP == value) {
@@ -197,8 +197,8 @@ public class SunVectorBuilder   {
         }
     }
 
-    private static int mapSetterIdx = 0;
-    private static MapSetter[]  MAP_SETTERS = new MapSetter[] {
+    private  int mapSetterIdx = 0;
+    private  MapSetter[]  MAP_SETTERS = new MapSetter[] {
             new MapSetter("upper_level".hashCode(), val -> prop.upperLevel = toString(val)),
             new MapSetter("phenomenon".hashCode(), val -> prop.phenomenon = toString(val)),
             new MapSetter("raw_type".hashCode(), val -> prop.rawType = toString(val)),
@@ -221,7 +221,7 @@ public class SunVectorBuilder   {
             new MapSetter(JsonStreamString.N_ARRAY.hashCode(), null  ),
     };
 
-    private static void onProperties2(JsonStream streamer, String name, Object value, int typeIdx) {
+    private  void onProperties2(JsonStream streamer, String name, Object value, int typeIdx) {
         if (JsonStreamString.START_MAP == value) {
             prop = new Properties();
         } else if (JsonStreamString.END_MAP == value) {
@@ -243,7 +243,7 @@ public class SunVectorBuilder   {
         }
     }
 
-    public static SunVectorData parse(String jsonStr)   {
+    public  SunVectorData parse(String jsonStr)   {
 
         if (workingItems == null) {
             workingItems = new ArrayList<>(64);
@@ -258,13 +258,13 @@ public class SunVectorBuilder   {
         JsonStream baseStreamer = new JsonStreamString(jsonStr,
                 (streamer, name, value, type) -> {
                     if (JsonStreamString.START_ARRAY == value && "features".equals(name))
-                        streamer.push(SunVectorBuilder::onFeature, "onFeature");
+                        streamer.push(this::onFeature, "onFeature");
                 }, SunVectorBuilder::onError);
 
         return workingItems.isEmpty() ? null : new SunVectorData(workingItems);
     }
 
-    public static SunVectorData parse(byte[] jsonBytes)   {
+    public  SunVectorData parse(byte[] jsonBytes)   {
 
         if (workingItems == null) {
             workingItems = new ArrayList<>(64);
@@ -279,13 +279,31 @@ public class SunVectorBuilder   {
         JsonStream baseStreamer = new JsonStreamBytes(jsonBytes,
                 (streamer, name, value, type) -> {
                     if (JsonStreamString.START_ARRAY == value && "features".equals(name))
-                        streamer.push(SunVectorBuilder::onFeature, "onFeature");
+                        streamer.push(this::onFeature, "onFeature");
                 }, SunVectorBuilder::onError);
 
         return workingItems.isEmpty() ? null : new SunVectorData(workingItems);
     }
 
-    public static void release() {
+    public  SunVectorData parse(byte[] jsonBytes, int startAt, int endAt)   {
+
+        if (workingItems == null) {
+            workingItems = new ArrayList<>(64);
+            polygons = new ArrayList<>(100);
+            coords = new ArrayList<>(1000);
+        } else {
+            workingItems.clear();
+            polygons.clear();
+            coords.clear();
+        }
+
+        JsonStream baseStreamer = new JsonStreamBytes(jsonBytes, startAt, endAt,
+                this::onFeature, SunVectorBuilder::onError);
+
+        return workingItems.isEmpty() ? null : new SunVectorData(workingItems);
+    }
+
+    public  void release() {
         workingItems = null;    // 89
         polygons = null;        // 73
         coords = null;          // 19381

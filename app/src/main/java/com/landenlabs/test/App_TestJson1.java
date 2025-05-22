@@ -108,11 +108,13 @@ public class App_TestJson1 {
 
             total = 0;
             com.landenlabs.test.JsonStream1.SunVectorData vdata3 = null;
+            SunVectorBuilder vectorBuilder = new SunVectorBuilder();
             for (int idx = 0; idx < CNT; idx++) {
-                vdata3 = SunVectorBuilder.parse(jsonStr);
+                vdata3 = vectorBuilder.parse(jsonStr);
                 total += vdata3.items.size();
             }
-            SunVectorBuilder.release();
+            vectorBuilder.release();
+            vectorBuilder = null;
             stmDelta = showMemory(String.format("Stream VectorData size=%,d", total)).deltaMilli;
 
             if ( !vdata1.equals(vdata2) ) {

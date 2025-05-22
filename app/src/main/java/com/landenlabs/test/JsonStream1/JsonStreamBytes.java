@@ -70,6 +70,23 @@ public class JsonStreamBytes implements JsonStream {
         }
     }
 
+    public JsonStreamBytes(byte[] jsonBytes, int startAt, int endAt, StreamCb streamCb, ErrorCb errorCb) {
+        this.jsonBytes = jsonBytes;
+        this.streamCb = streamCb;
+        this.errorCb = errorCb;
+        this.len = endAt;
+        this.idx = startAt;
+
+        level = 0;
+
+        try {
+            next(-1, N_ARRAY);
+        } catch (Exception ex) {
+            System.err.println("JsonStream exception=" + ex);
+            gotError();
+        }
+    }
+
     void gotError() {
         String errMsg;
         if (idx < len) {
