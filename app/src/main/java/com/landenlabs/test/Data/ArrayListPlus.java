@@ -7,6 +7,14 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
+/**
+ * Standard Android/Java ArrayList class extended with optional cache used
+ * when growing array. When growing try and use item from cache and when discarding
+ * place in cache.  Goal is to increase performance by avoiding memory allocation.
+ *
+ * Incrementally adding items will cause identical reallocation pattern and
+ * storing and reusing the discard buffers can be used by subsequent use patterns. 
+ */
 public class ArrayListPlus<E> extends AbstractList<E>
         implements List<E>, RandomAccess, Cloneable
 {

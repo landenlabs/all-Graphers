@@ -10,14 +10,15 @@ android {
         applicationId "com.landenlabs.all_graphers"
         minSdk 28
         targetSdk 35
-        versionCode 1
-        versionName "1.0"
+        versionCode 10203
+        versionName "1.2.3"
 
         testApplicationId "com.landenlabs.test.A_TestJson1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testHandleProfiling true
         testFunctionalTest true
     }
+
 
     buildTypes {
         release {
@@ -27,12 +28,19 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
 
     buildFeatures {
         viewBinding true
+        buildConfig = true
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+        disable 'DefaultLocale',  'ContentDescription', 'UnusedAttribute'
     }
 }
 
