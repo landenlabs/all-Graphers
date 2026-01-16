@@ -2,9 +2,12 @@ package com.landenlabs.test.JsonStream1;
 
 import androidx.annotation.Nullable;
 
-import com.landenlabs.test.Data.PolyItems.*;
-import com.landenlabs.test.Data.SunVectorDataI;
+import com.landenlabs.test.Data.PolyItems.GeoPolygon;
+import com.landenlabs.test.Data.PolyItems.GeoPolygons;
+import com.landenlabs.test.Data.PolyItems.Item;
+import com.landenlabs.test.Data.PolyItems.Properties;
 import com.landenlabs.test.Data.WLatLng;
+
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
@@ -125,9 +128,11 @@ public class SunVectorBuilder   {
                 case "active_at":
                     prop.activeTime = getDateTime(value);
                     break;
+                case "effectiveTimeLocal":
                 case "issue_time":
                     prop.issueTime = getDateTime(value);
                     break;
+                case "expireTimeLocal":
                 case "expire_at":
                     prop.expireTime = getDateTime(value);
                     break;
@@ -143,6 +148,10 @@ public class SunVectorBuilder   {
                 case "airmet_category":
                     prop.category = toString(value);
                     break;
+                case "category":
+                    prop.category = toString(value);
+                    break;
+                case "phenomena":
                 case "phenomenon":
                     prop.phenomenon = toString(value);
                     break;
@@ -170,6 +179,7 @@ public class SunVectorBuilder   {
                 case "moving_dir":
                     prop.movingDir = getDouble(value);
                     break;
+                case "headlineText":
                 case "data":
                     prop.data = toSpecialString(value);
                     break;
@@ -180,7 +190,7 @@ public class SunVectorBuilder   {
                 case JsonStreamString.N_ARRAY:
                     break;
                 default:
-                    System.out.println("Ignoring " + name);
+                    // System.out.println("Ignoring " + name);
             }
         }
     }

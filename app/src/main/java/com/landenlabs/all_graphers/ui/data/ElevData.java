@@ -9,7 +9,6 @@ import static com.landenlabs.all_graphers.ui.data.StrUtils.hasText;
 
 import android.graphics.PointF;
 
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;

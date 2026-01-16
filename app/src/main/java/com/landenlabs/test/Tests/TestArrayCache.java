@@ -1,13 +1,13 @@
 package com.landenlabs.test.Tests;
 
+import static com.landenlabs.test.utils.MemUtils.initMemory;
+import static com.landenlabs.test.utils.MemUtils.showMemory;
+
 import com.landenlabs.test.Data.ArrayCache;
 import com.landenlabs.test.Data.ArrayCache16;
 
 import java.io.IOException;
 import java.util.Arrays;
-
-import static com.landenlabs.test.utils.MemUtils.initMemory;
-import static com.landenlabs.test.utils.MemUtils.showMemory;
 
 public class TestArrayCache {
 

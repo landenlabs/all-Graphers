@@ -2,7 +2,12 @@ package com.landenlabs.test.JsonOrg;
 
 import androidx.annotation.Nullable;
 
-import com.landenlabs.test.Data.PolyItems.*;
+import com.landenlabs.test.Data.PolyItems.GeoItem;
+import com.landenlabs.test.Data.PolyItems.GeoMultiPolygons;
+import com.landenlabs.test.Data.PolyItems.GeoPolygons;
+import com.landenlabs.test.Data.PolyItems.GeoType;
+import com.landenlabs.test.Data.PolyItems.Item;
+import com.landenlabs.test.Data.PolyItems.Properties;
 import com.landenlabs.test.Data.SunVectorDataI;
 
 import org.joda.time.DateTime;

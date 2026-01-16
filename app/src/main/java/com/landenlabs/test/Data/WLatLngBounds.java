@@ -1,9 +1,10 @@
 package com.landenlabs.test.Data;
 
 
-import androidx.annotation.NonNull;
 import android.annotation.SuppressLint;
 import android.graphics.RectF;
+
+import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -16,8 +17,8 @@ import java.util.Objects;
 
 @SuppressWarnings("WeakerAccess")
 public final class WLatLngBounds {
-    public final WLatLng northeast;
-    public final WLatLng southwest;
+    public  WLatLng northeast;
+    public  WLatLng southwest;
     // public static final LatLngBoundsCreator CREATOR = new LatLngBoundsCreator();
     // private final int version;
 
@@ -65,6 +66,23 @@ public final class WLatLngBounds {
         return EMPTY;
     }
 
+    public void add(WLatLng point) {
+        this.southwest = new WLatLng(
+                Math.min(southwest.latitude, point.latitude),
+                Math.min(southwest.longitude, point.longitude));
+        this.northeast = new WLatLng(
+                Math.max(northeast.latitude, point.latitude),
+                Math.max(northeast.longitude, point.longitude));
+    }
+
+    public void add(WLatLngBounds other) {
+        this.southwest = new WLatLng(
+                Math.min(southwest.latitude, other.southwest.latitude),
+                Math.min(southwest.longitude, other.southwest.longitude));
+        this.northeast = new WLatLng(
+                Math.max(northeast.latitude, other.northeast.latitude),
+                Math.max(northeast.longitude, other.northeast.longitude));
+    }
 
 
     public WLatLng southeast() {

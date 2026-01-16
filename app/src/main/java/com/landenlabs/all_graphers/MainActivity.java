@@ -4,8 +4,6 @@ import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES;
 
 import android.os.Bundle;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.navigation.NavController;
@@ -13,6 +11,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.landenlabs.all_graphers.databinding.ActivityMainBinding;
 import com.landenlabs.test.App_TestJson1;
 
@@ -39,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
         AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_YES);
 
-        // App_TestJson1 testJson1 = new App_TestJson1(getApplicationContext());
-        // testJson1.test1();
+        App_TestJson1 testJson1 = new App_TestJson1(getApplicationContext());
+        testJson1.test1();
     }
 }

@@ -6,7 +6,6 @@
 package com.landenlabs.all_graphers.ui.logger;
 
 import static android.content.Context.ACTIVITY_SERVICE;
-
 import static com.landenlabs.all_graphers.ui.logger.ALogUtils.getString;
 
 import android.app.ActivityManager;
@@ -27,7 +26,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
 
 import com.landenlabs.all_graphers.BuildConfig;
 

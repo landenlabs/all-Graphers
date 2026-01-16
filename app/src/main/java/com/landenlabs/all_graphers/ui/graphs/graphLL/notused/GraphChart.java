@@ -2,9 +2,7 @@ package com.landenlabs.all_graphers.ui.graphs.graphLL.notused;
 
 import static android.graphics.PathDashPathEffect.Style.TRANSLATE;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-
 import static com.landenlabs.all_graphers.ui.data.UiUtils.layoutFromAnyStyle;
-import static com.landenlabs.all_graphers.ui.data.UiUtils.layoutFromStyle;
 
 import android.content.Context;
 import android.content.res.Resources;

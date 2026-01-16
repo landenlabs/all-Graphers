@@ -4,14 +4,14 @@
  */
 package com.landenlabs.test.JsonDennis;
 
+import static java.lang.Character.isWhitespace;
+
 import com.landenlabs.test.Data.ArrayCache;
 import com.landenlabs.test.Data.ArrayCache16;
 import com.landenlabs.test.Data.ArrayListPlus;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static java.lang.Character.isWhitespace;
 
 /**
  * Parse Json into nested hash maps.

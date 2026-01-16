@@ -1,31 +1,46 @@
 package com.landenlabs.test;
 
+import static com.landenlabs.mvt.MvtReader.loadMvt2;
+import static com.landenlabs.mvt.MvtReader.loadMvt3;
 import static com.landenlabs.test.utils.MemUtils.initMemory;
 import static com.landenlabs.test.utils.MemUtils.showMemory;
+import static com.wdtinc.mapbox_vector_tile.adapt.jts.MvtReader.loadMvt;
 import static org.junit.Assert.assertEquals;
+
+import android.content.Context;
+import android.content.res.AssetManager;
+import android.util.Log;
+
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.landenlabs.all_graphers.ui.logger.ALog;
 import com.landenlabs.test.Data.PolyItems;
 import com.landenlabs.test.Data.SunVectorDataI;
 import com.landenlabs.test.Data.WLatLng;
 import com.landenlabs.test.JsonStream1.SunVectorBuilder;
+import com.wdtinc.mapbox_vector_tile.adapt.jts.ITagConverter;
+import com.wdtinc.mapbox_vector_tile.adapt.jts.MvtReader;
+import com.wdtinc.mapbox_vector_tile.adapt.jts.TagKeyValueMapConverter;
+import com.wdtinc.mapbox_vector_tile.adapt.jts.model.JtsLayer;
+import com.wdtinc.mapbox_vector_tile.adapt.jts.model.JtsMvt;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.geom.PrecisionModel;
+import org.locationtech.jts.geom.impl.PackedCoordinateSequenceFactory;
 
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-
-import android.content.Context;
-import android.content.res.AssetManager;
-import android.util.JsonReader;
-import android.util.Log;
-
-import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.platform.app.InstrumentationRegistry;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -89,6 +104,97 @@ public class A_TestJson1 {
         return text;
     }
 
+    public static class LatLng {
+        double latDeg;
+        double lngDeg;
+    }
+
+    // https://gis.stackexchange.com/questions/401541/decoding-mapbox-vector-tiles/460173#460173
+    public static LatLng pixel2deg(int xTile, int yTile, int zoom, double xPixel, double yPixel, int numPixelPerTile) {
+        double n = Math.pow(2.0, zoom);
+        double xTileD = xTile + (xPixel / numPixelPerTile);
+        double yTileD = yTile + ((numPixelPerTile - yPixel) / numPixelPerTile);
+
+        LatLng latLng = new LatLng();
+        latLng.lngDeg = (xTileD / n) * 360.0 - 180.0;
+        double lat_rad = -Math.atan(Math.sinh(Math.PI * (1 - 2 * yTileD / n)));
+        latLng.latDeg = Math.toDegrees(lat_rad);
+        return latLng;
+    }
+
+    /*
+        ./get-watchwarnings-json.pl
+        curl -sS "https://api.weather.com/v2/vector-api/products/648/features?x=0&y=0&lod=0&tile-size=256&apiKey=6f0a14af513d4dad8a14af513dadad99&time=1764691922000&format=mvt" -o alert.mvt
+        curl -sS "https://api.weather.com/v2/vector-api/products/648/features?x=0&y=0&lod=0&tile-size=256&apiKey=6f0a14af513d4dad8a14af513dadad99&time=1764691922000" -o alert.json
+     */
+    @Test
+    public void test0() {
+        // byte[] jsonBytes = loadAssetBytes("alert.json");
+        // String jsonStr = new String(jsonBytes);
+        initMemory();
+        try {
+            AssetManager assetManager = appContext.getAssets();
+            InputStream input = assetManager.open("alert.mvt");
+
+            final int NUMBER_OF_DIMENSIONS = 2;
+            final int SRID = 0;
+            final PrecisionModel precisionModel = new PrecisionModel();
+            final PackedCoordinateSequenceFactory coordinateSequenceFactory =
+                    new PackedCoordinateSequenceFactory(PackedCoordinateSequenceFactory.DOUBLE, NUMBER_OF_DIMENSIONS);
+            GeometryFactory geoFac = new GeometryFactory(precisionModel, SRID, coordinateSequenceFactory);
+            ITagConverter tagConverter = new TagKeyValueMapConverter();
+
+            final JtsMvt mvt = loadMvt3(input, geoFac, tagConverter,  com.landenlabs.mvt.MvtReader.RING_CLASSIFIER_V1);
+
+            int total = 0;
+            for (JtsLayer layer : mvt.getLayers()) {
+                ArrayList<Geometry> geometry = (ArrayList<Geometry>)layer.getGeometries();
+                LatLng ll;
+
+                for (int gIdx = 0; gIdx < geometry.size(); gIdx++) {
+                    final Polygon polygon = (Polygon) geometry.get(gIdx);
+                    Object obj = polygon.getUserData();
+                    if (obj instanceof Map) {
+                        Map<String, Object> prop = (Map<String, Object>) obj;
+                        String cat = prop.get("category").toString();
+                        String sig = prop.get("significance").toString();
+                        String cntry = prop.get("countryCode").toString();
+                        String pheno  = prop.get("phenomena").toString();
+
+                        // System.out.printf(" %3s %8s %3s %s [", cntry, cat, pheno, sig);
+                        int numGeom = polygon.getNumGeometries();
+
+                        for (int idx = 0; idx < numGeom; idx++) {
+                            final Geometry geom = polygon.getGeometryN(idx);
+                            int numCoord = geom.getNumPoints();
+                            total += numCoord;
+                            // System.out.printf(" %d\n", numCoord);
+                            Coordinate[] coor = geom.getCoordinates();
+
+                            for (int cIdx = 0; cIdx < numCoord; cIdx++) {
+                                double xPixel = coor[cIdx].x;
+                                double yPixel = coor[cIdx].y;
+                                ll = pixel2deg(0, 0, 0, xPixel, yPixel, 512*8); // 4096
+                                // System.out.printf("%,3f, %.3f\n", ll.latDeg, ll.lngDeg);
+                            }
+                            // System.out.println();
+                        }
+                        // System.out.println("]");
+                    }
+                }
+
+
+
+
+            }
+
+            showMemory("Alert MVT");
+            System.out.println( "MVT size="+ total);
+        } catch (Exception ex) {
+            ALog.e.tagMsg(this, "MVT failed ", ex);
+        }
+    }
+
     @Test
     public void test1() {
         Thread.setDefaultUncaughtExceptionHandler( new Thread.UncaughtExceptionHandler() {
@@ -100,12 +206,12 @@ public class A_TestJson1 {
 
         System.out.println("Java JRE=" + System.getProperty("java.version"));
         long denDelta=0, stdDelta=0, stmDelta=0;
-        int CNT = 100;
+        int CNT = 10;
 
         System.out.println("Start");
         try {
             int total;
-            byte[] jsonBytes = loadAssetBytes("test3.json");
+            byte[] jsonBytes = loadAssetBytes("alert.json");
             String jsonStr = new String(jsonBytes);
             initMemory();
 
@@ -118,7 +224,7 @@ public class A_TestJson1 {
                 vdata1 = com.landenlabs.test.JsonDennis.SunVectorData.parse(jsonStr);
                 total += vdata1.items.size();
             }
-            denDelta = showMemory(String.format("Den VectorData size=%,d", total)).deltaMilli;
+            denDelta = showMemory(String.format("%d exec, Den VectorData size=%,d", CNT, total)).deltaMilli;
 
             total = 0;
             com.landenlabs.test.JsonOrg.SunVectorData vdata2 = null;
@@ -126,7 +232,7 @@ public class A_TestJson1 {
                 vdata2 = com.landenlabs.test.JsonOrg.SunVectorData.parse(jsonStr);
                 total += vdata2.items.size();
             }
-            stdDelta = showMemory(String.format("Org VectorData size=%,d", total)).deltaMilli;
+            stdDelta = showMemory(String.format("%d exec, Org VectorData size=%,d", CNT, total)).deltaMilli;
 
             total = 0;
             com.landenlabs.test.JsonStream1.SunVectorData vdata3 = null;

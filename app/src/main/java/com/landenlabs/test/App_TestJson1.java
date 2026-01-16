@@ -3,20 +3,28 @@ package com.landenlabs.test;
 import static com.landenlabs.test.utils.MemUtils.initMemory;
 import static com.landenlabs.test.utils.MemUtils.showMemory;
 
+import android.content.Context;
+import android.content.res.AssetManager;
+import android.util.Log;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.landenlabs.all_graphers.ui.logger.ALog;
+import com.landenlabs.test.Data.CountThem;
 import com.landenlabs.test.Data.PolyItems;
 import com.landenlabs.test.Data.SunVectorDataI;
 import com.landenlabs.test.Data.WLatLng;
+import com.landenlabs.test.JsonGson1.GeoJsonFeature;
+import com.landenlabs.test.JsonGson1.GeometryDeserializer;
 import com.landenlabs.test.JsonStream1.SunVectorBuilder;
+import com.landenlabs.test.JsonStream2.SunVectorBldJstream;
+import com.landenlabs.test.JsonStream2.SunVectorData;
+
 
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-
-import android.content.Context;
-import android.content.res.AssetManager;
-import android.util.Log;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -39,23 +47,28 @@ public class App_TestJson1 {
     }
      */
 
-    private String loadAssetFile(String filename) {
+    private String loadAssetFileAsString(String filename) {
+        return new String(loadAssetFileAsBytes(filename));
+    }
+
+    private byte[] loadAssetFileAsBytes(String filename) {
         AssetManager assetManager = appContext.getAssets();
         InputStream input;
-        String text = "";
+        byte[] buffer = null;
 
         try {
             input = assetManager.open(filename);
             int size = input.available();
-            byte[] buffer = new byte[size];
+            buffer = new byte[size];
             int readLen = input.read(buffer);
             input.close();
-            text = new String(buffer);
+
         } catch (Exception ex) {
             Log.e(ALog.TAG_PREFIX, "Failed to read asset file " + filename, ex);
         }
-        return text;
+        return buffer;
     }
+
     private String loadLocalFile(String filename) {
         String text = "";
         try {
@@ -77,18 +90,19 @@ public class App_TestJson1 {
             }
         });
 
-        System.out.println("Java JRE=" + System.getProperty("java.version"));
-        long denDelta=0, stdDelta=0, stmDelta=0;
-        int CNT = 100;
+        System.out.println("Start Java JRE=" + System.getProperty("java.version"));
+        long denDelta=0, stdDelta=0, stm1Delta=0, stm2Delta=0, gson1Delta=0;
+        int CNT = 20;
 
-        System.out.println("Start");
         try {
-            int total;
-            String jsonStr = loadAssetFile("test3.json");
+            int total = 0;
+            String jsonStr = loadAssetFileAsString("test3.json");
+            byte[] jsonBytes = loadAssetFileAsBytes("test3.json");
             initMemory();
 
             com.landenlabs.test.JsonDennis.JsonReader reader = new com.landenlabs.test.JsonDennis.JsonReader(jsonStr, true);
-            showMemory("JsonReader");
+            showMemory(String.format("%,5d %20s", reader.data.base.size(), "JsonReader"));
+            CountThem.count(reader.data.base, new CountThem()).print();
 
             total = 0;
             com.landenlabs.test.JsonDennis.SunVectorData vdata1 = null;
@@ -96,7 +110,7 @@ public class App_TestJson1 {
                 vdata1 = com.landenlabs.test.JsonDennis.SunVectorData.parse(jsonStr);
                 total += vdata1.items.size();
             }
-            denDelta = showMemory(String.format("Den VectorData size=%,d", total)).deltaMilli;
+            denDelta = showMemory(String.format("%,5d %20s", total, "Den VectorData")).deltaMilli;
 
             total = 0;
             com.landenlabs.test.JsonOrg.SunVectorData vdata2 = null;
@@ -104,7 +118,7 @@ public class App_TestJson1 {
                 vdata2 = com.landenlabs.test.JsonOrg.SunVectorData.parse(jsonStr);
                 total += vdata2.items.size();
             }
-            stdDelta = showMemory(String.format("Org VectorData size=%,d", total)).deltaMilli;
+            stdDelta = showMemory(String.format("%,5d %20s", total, "Org VectorData")).deltaMilli;
 
             total = 0;
             com.landenlabs.test.JsonStream1.SunVectorData vdata3 = null;
@@ -115,7 +129,28 @@ public class App_TestJson1 {
             }
             vectorBuilder.release();
             vectorBuilder = null;
-            stmDelta = showMemory(String.format("Stream VectorData size=%,d", total)).deltaMilli;
+            stm1Delta = showMemory(String.format("%,5d %20s", total, "Stream1 VectorData")).deltaMilli;
+
+            total = 0;
+            SunVectorBldJstream sunVectorBldr = new SunVectorBldJstream();
+            SunVectorData vData4 = null;
+            for (int idx = 0; idx < CNT; idx++) {
+                vData4  = sunVectorBldr.parse(jsonBytes, "prodCode", null);
+                total += vData4.items.size();
+            }
+            stm2Delta = showMemory(String.format("%,5d %20s", total, "Stream2 VectorData")).deltaMilli;
+            CountThem.count(vData4, new CountThem()).print();
+
+            total = 0;
+            GsonBuilder gsonBuilder = new GsonBuilder();
+            gsonBuilder.registerTypeAdapter(GeoJsonFeature.Geometry.class, new GeometryDeserializer());
+            Gson gson = gsonBuilder.setLenient().create();
+            for (int idx = 0; idx < CNT; idx++) {
+                com.landenlabs.test.JsonGson1.SunVectorData vData5
+                  = gson.fromJson(jsonStr, com.landenlabs.test.JsonGson1.SunVectorData.class);
+                total += vData5.features.size();
+            }
+            gson1Delta = showMemory(String.format("%,5d %20s", total, "Gson1 VectorData")).deltaMilli;
 
             if ( !vdata1.equals(vdata2) ) {
                 System.err.println("vdata1 != vdata2");
@@ -136,8 +171,10 @@ public class App_TestJson1 {
             // ex.printStackTrace();
         }
 
-        System.out.printf("Den faster than std by %.2f%%\n", (stdDelta - denDelta) * 100f / stdDelta);
-        System.out.printf("Stm faster than std by %.2f%%\n", (stdDelta - stmDelta) * 100f / stdDelta);
+        System.out.printf("Den  faster than Org by %.2f%%\n", (stdDelta - denDelta) * 100f / stdDelta);
+        System.out.printf("Stm1 faster than Org by %.2f%%\n", (stdDelta - stm1Delta) * 100f / stdDelta);
+        System.out.printf("Stm2 faster than Org by %.2f%%\n", (stdDelta - stm2Delta) * 100f / stdDelta);
+        System.out.printf("Gson1 faster than Org by %.2f%%\n", (stdDelta - gson1Delta) * 100f / stdDelta);
         System.out.println("[Done]");
     }
 

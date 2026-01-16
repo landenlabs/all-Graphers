@@ -1,14 +1,12 @@
 package com.landenlabs.all_graphers.ui.dashboard;
 
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.graphics.PointF;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.Checkable;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -23,7 +21,6 @@ import com.landenlabs.all_graphers.ui.data.WxDataHolder;
 import com.landenlabs.all_graphers.ui.graphs.GraphData;
 import com.landenlabs.all_graphers.ui.graphs.GraphType;
 import com.landenlabs.all_graphers.ui.graphs.graphLL.GraphLineMgr;
-import com.landenlabs.all_graphers.ui.graphs.graphLL.notused.GraphChart;
 import com.landenlabs.all_graphers.ui.logger.ALog;
 
 import java.util.ArrayList;

@@ -20,7 +20,6 @@ import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -33,16 +32,13 @@ import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.StyleRes;
 
-
 import com.landenlabs.all_graphers.R;
-import com.landenlabs.all_graphers.ui.data.ElevData;
 import com.landenlabs.all_graphers.ui.data.Ui;
 import com.landenlabs.all_graphers.ui.graphs.GraphData;
 import com.landenlabs.all_graphers.ui.graphs.GraphType;
 import com.landenlabs.all_graphers.ui.logger.ALog;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Locale;
 
 /**

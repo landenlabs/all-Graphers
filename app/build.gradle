@@ -67,6 +67,11 @@ dependencies {
     implementation libs.converter.gson
     implementation libs.android.joda
 
+    // Mapbox mvt
+    // https://github.com/wdtinc/mapbox-vector-tile-java/tree/readme_upgrade#
+    implementation  'com.wdtinc:mapbox-vector-tile:3.0.0'
+
+
     testImplementation libs.annotation
     testImplementation libs.test.junit
 
@@ -79,6 +84,7 @@ dependencies {
     // AndroidJUnitRunner and JUnit Rules
     androidTestImplementation libs.test.runner
     androidTestImplementation libs.test.rules
+
     // Assertions
     androidTestImplementation libs.test.ext.junit
     androidTestImplementation libs.test.truth

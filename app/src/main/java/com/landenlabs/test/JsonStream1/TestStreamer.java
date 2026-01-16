@@ -1,13 +1,13 @@
 package com.landenlabs.test.JsonStream1;
 
+import static com.landenlabs.test.utils.MemUtils.initMemory;
+import static com.landenlabs.test.utils.MemUtils.showMemory;
+
 import com.landenlabs.test.utils.MemUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayDeque;
-
-import static com.landenlabs.test.utils.MemUtils.initMemory;
-import static com.landenlabs.test.utils.MemUtils.showMemory;
 
 public class TestStreamer {
 

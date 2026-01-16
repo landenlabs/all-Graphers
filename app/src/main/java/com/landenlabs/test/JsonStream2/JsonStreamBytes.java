@@ -1,14 +1,38 @@
 /*
-    Dennis Lang  (landenlabs.com)
-    Dec-2024
+ * Copyright © 2024 The Weather Company. All rights reserved.
  */
-package com.landenlabs.test.JsonStream1;
+
+package com.landenlabs.test.JsonStream2;
+
+
+import static com.landenlabs.test.JsonStream2.JsonTokens.END_ARRAY;
+import static com.landenlabs.test.JsonStream2.JsonTokens.END_MAP;
+import static com.landenlabs.test.JsonStream2.JsonTokens.IGNORE;
+import static com.landenlabs.test.JsonStream2.JsonTokens.N_ARRAY;
+import static com.landenlabs.test.JsonStream2.JsonTokens.N_ROOT;
+import static com.landenlabs.test.JsonStream2.JsonTokens.START_ARRAY;
+import static com.landenlabs.test.JsonStream2.JsonTokens.START_MAP;
+import static com.landenlabs.test.JsonStream2.JsonTokens.T_ARRAY;
+import static com.landenlabs.test.JsonStream2.JsonTokens.T_MAP;
+
 
 import java.util.ArrayDeque;
 
 /**
- * Parse Json into nested hash maps.
- * Json syntax - https://www.json.org/json-en.html
+ * Parse Json as a stream, calling 'StreamCb' callbacks as state
+ * changes and/or name/value pairs are provided.
+ * <p>
+ *  Example
+ *  <pre>
+ *      JsonStream baseStreamer = new JsonStreamBytes(jsonBytes,
+ *         (streamer, name, value, type) -> {
+ *             if (JsonStream.START_ARRAY == value && "features".equals(name))
+ *                 streamer.push(this::onFeature, "onFeature");
+ *         }, SunVectorBldJstream::onError);
+ *
+ *  </pre>
+ *
+ * Json syntax - https ://www.json.org/json-en.html
  */
 public class JsonStreamBytes implements JsonStream {
     private final byte[] jsonBytes;
@@ -16,16 +40,7 @@ public class JsonStreamBytes implements JsonStream {
     private int idx;
     private int level;
 
-    public static final String N_ROOT = "";
-    public static final String N_ARRAY = "NA";
-    public static final int T_MAP = -2;
-    public static final int T_ARRAY = -1;
-    public static final String START_ARRAY = "SA";
-    public static final String END_ARRAY = "EA";
-    public static final String START_MAP = "SM";
-    public static final String END_MAP = "EM";
-    public static final String IGNORE = "IG";
-
+    // Byte equivalent of characters constants.
     public static final byte B_LBRACE = '{';
     public static final byte B_RBRACE = '}';
     public static final byte B_LBRACKET = '[';
@@ -35,22 +50,18 @@ public class JsonStreamBytes implements JsonStream {
     public static final byte B_COMMA = ',';
     public static final byte B_BSLASH = '\\';
 
-    public static final int MAX_LEVELS = 20;
-
+    // Functional callbacks
+    private String dbgTag = "";
     private StreamCb streamCb;
     private final ErrorCb errorCb;
 
-    private final ArrayDeque<StreamCb> queueCb = new ArrayDeque<>(10);
-
-    public void push(StreamCb streamCb, String dbgTag) {
-        queueCb.addLast(this.streamCb);
-        this.streamCb = streamCb;
-    }
-    public void pop() {
-        this.streamCb = queueCb.removeLast();
-    }
+    private record CbHolder(StreamCb streamCb, String dbgTag) {}
+    private final ArrayDeque<JsonStreamBytes.CbHolder> queueCb = new ArrayDeque<>(10);
 
 
+    /**
+     * Common constructor to stream parse json bytes.
+     */
     public JsonStreamBytes(byte[] jsonBytes, StreamCb streamCb, ErrorCb errorCb) {
         this.jsonBytes = jsonBytes;
         this.streamCb = streamCb;
@@ -67,6 +78,9 @@ public class JsonStreamBytes implements JsonStream {
         }
     }
 
+    /**
+     * Experimental constructor intended for split json threaded optimization.
+     */
     public JsonStreamBytes(byte[] jsonBytes, int startAt, int endAt, StreamCb streamCb, ErrorCb errorCb) {
         this.jsonBytes = jsonBytes;
         this.streamCb = streamCb;
@@ -84,11 +98,31 @@ public class JsonStreamBytes implements JsonStream {
         }
     }
 
-    void gotError() {
+    /**
+     * Switch to new callback, push previous onto queue.
+     */
+    public void push(StreamCb streamCb, String dbgTag) {
+        // ALog.d.tagMsg(this, "Json push=", this.dbgTag, " -> ", dbgTag);
+        queueCb.addLast(new CbHolder(this.streamCb, this.dbgTag));
+        this.streamCb = streamCb;
+        this.dbgTag = dbgTag;
+    }
+
+    /**
+     * Restore previous callback.
+     */
+    public void pop() {
+        CbHolder cbHolder = queueCb.removeLast();
+        // ALog.d.tagMsg(this, "Json pop ", dbgTag, " -> ", cbHolder.dbgTag);
+        this.streamCb = cbHolder.streamCb;
+        this.dbgTag = cbHolder.dbgTag();
+    }
+
+    private void gotError() {
         String errMsg;
         if (idx < len) {
             errMsg = "Error at position=" + idx
-                    + ", json=" + new String(jsonBytes, idx, 10) // (byte[], offset, length)
+             //       + ", json=" + ByteUtils.toString(jsonBytes, idx, 10) // (byte[], offset, length)
                     + " length=" + len;
         } else {
             errMsg = "Error at position=" + idx + " JsonTotalLen=" + len;
@@ -99,11 +133,19 @@ public class JsonStreamBytes implements JsonStream {
             System.err.println(errMsg);
     }
 
+    /**
+     * Single method where StreamCb Functional interface is called, to make it
+     * easier to debug.
+     */
     void dbgOnValue(JsonStreamBytes streamer, String name, Object value, int type) {
+        // ALog.d.tagMsg(this, "Json name=", name, " value=", value);  // DEBUG
         // if (IGNORE != value)
             streamCb.onValue(streamer, name, value, type);
     }
 
+    /**
+     * Json level for {} or [] nesting.
+     */
     public int getLevel() {
         return level;
     }
@@ -149,14 +191,18 @@ public class JsonStreamBytes implements JsonStream {
         return pos;
     }
 
+    /**
+     * Warning - does not handle any special character conversion, such as \n to newline.
+     */
     private String getQuoted() {
-        int beg = idx++;
-        int end = beg;
+        int beg = idx;
+        int end = beg -1; // backup 1, because do-loop starts with ++
         do { end++; end = findQuote(end); }
-            while (jsonBytes[end-1] ==  B_BSLASH); // '\\');
+            while (jsonBytes[end-1] == B_BSLASH); // '\\');
 
         idx = end+1;
-        return new String(jsonBytes, beg, end-beg);   // (byte[], offset, length)
+        // return new String(jsonBytes, beg, end-beg);   // (byte[], offset, length)
+        return com.landenlabs.test.JsonStream2.ByteUtils.toString(jsonBytes, beg, end-beg);
     }
 
     private Object getValue(int ourLevel, String name) {
@@ -185,13 +231,15 @@ public class JsonStreamBytes implements JsonStream {
             return IGNORE;
         } else {
             toFieldEnd();
-            // TODO - keep as byte array for numeric conversions.
-            String value = new String(jsonBytes, beg, idx-beg);     // (byte[], offset, length)
+            // Optimize - keep as byte array for numeric conversions and static string comparison.
+            String value = com.landenlabs.test.JsonStream2.ByteUtils.toString(jsonBytes, beg, idx-beg);     // (byte[], offset, length)
             if (value.isEmpty() )
                 return null;  // { } or [ ]
-            if (value.indexOf('.') != -1)
+            if (value.indexOf('.') != -1) {
                 return Double.parseDouble(value);
+                //   If using JDOUBLE, make matching change to SunVectorBldJstream, etc
                 // return JDOUBLE.set(value); //  Double.parseDouble(value);
+            }
             if (value.equalsIgnoreCase("null"))
                 return null;
             if (value.equalsIgnoreCase("true"))
@@ -215,7 +263,7 @@ public class JsonStreamBytes implements JsonStream {
 
     // Advance until one of:  comma, brace, bracket or whitespace.
     private void toFieldEnd() {
-        byte c = (byte)'?';
+        byte c;
         while (idx < len) {
             c = jsonBytes[idx];
             if (isWhitespace(c) || c == B_COMMA || c == B_RBRACE || c == B_RBRACKET)
