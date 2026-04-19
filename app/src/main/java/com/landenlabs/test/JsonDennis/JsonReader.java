@@ -1,6 +1,5 @@
 /*
-    Dennis Lang  (landenlabs.com)
-    Dec-2024
+    Copyright (c) 2026 Dennis Lang (LanDen Labs) landenlabs@gmail.com
  */
 package com.landenlabs.test.JsonDennis;
 

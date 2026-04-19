@@ -1,5 +1,5 @@
 [versions]
-agp = "8.9.0"
+agp = "9.1.1"
 androidJoda = "2.14.0"
 androidplotCore = "1.5.11"
 annotation = "1.9.1"
@@ -12,7 +12,7 @@ junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 appcompat = "1.7.1"
-material = "1.12.0"
+material = "1.13.0"
 constraintlayout = "2.2.1"
 lifecycleLivedataKtx = "2.9.0"
 lifecycleViewmodelKtx = "2.9.0"
@@ -24,12 +24,14 @@ robolectric = "4.12.2"
 runner = "1.6.2"
 truth = "1.6.0"
 truthVersion = "1.1.3"
+mapboxVectorTile = "3.0.0"
 
 [libraries]
 android-joda = { module = "net.danlew:android.joda", version.ref = "androidJoda" }
 androidplot-core = { module = "com.androidplot:androidplot-core", version.ref = "androidplotCore" }
 annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
+mapboxvectortile = { module = "com.wdtinc:mapbox-vector-tile", version.ref = "mapboxVectorTile" }
 
 test-jmh-core = { module = "org.openjdk.jmh:jmh-core", version.ref = "jmhCore" }
 test-jmh-generator-annprocess = { module = "org.openjdk.jmh:jmh-generator-annprocess", version.ref = "jmhCore" }
@@ -57,4 +59,3 @@ navigation-ui = { group = "androidx.navigation", name = "navigation-ui", version
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-

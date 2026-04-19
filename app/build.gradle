@@ -3,101 +3,94 @@ plugins {
 }
 
 android {
-    namespace 'com.landenlabs.all_graphers'
-    compileSdk 35
+    namespace = "com.landenlabs.all_graphers"
+    compileSdk = 36
 
     defaultConfig {
-        applicationId "com.landenlabs.all_graphers"
-        minSdk 28
-        targetSdk 35
-        versionCode 10203
-        versionName "1.2.3"
+        applicationId = "com.landenlabs.all_graphers"
+        minSdk = 28
+        targetSdk = 36
+        versionCode = 10203
+        versionName = "1.2.3"
 
-        testApplicationId "com.landenlabs.test.A_TestJson1"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        testHandleProfiling true
-        testFunctionalTest true
+        testApplicationId = "com.landenlabs.test.A_TestJson1"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testHandleProfiling = true
+        testFunctionalTest = true
     }
-
 
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            minifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_21
-        targetCompatibility JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
     }
 
     buildFeatures {
-        viewBinding true
+        viewBinding = true
         buildConfig = true
     }
 
     lint {
-        abortOnError false
-        checkReleaseBuilds false
-        disable 'DefaultLocale',  'ContentDescription', 'UnusedAttribute'
+        abortOnError = false
+        checkReleaseBuilds = false
+        disable("DefaultLocale", "ContentDescription", "UnusedAttribute")
+    }
+
+    // Modern way to rename APK
+    androidComponents {
+        onVariants(selector().all()) { variant ->
+            variant.outputs.forEach { output ->
+                output.outputFileName.set("${rootProject.name}-${variant.name}-${variant.outputs.get(0).versionName.get()}.apk")
+            }
+        }
     }
 }
 
 dependencies {
-
-    implementation libs.annotation
-    implementation libs.appcompat
-    implementation libs.material
-    implementation libs.constraintlayout
-    implementation libs.lifecycle.livedata.ktx
-    implementation libs.lifecycle.viewmodel.ktx
-    implementation libs.navigation.fragment
-    implementation libs.navigation.ui
+    implementation(libs.annotation)
+    implementation(libs.appcompat)
+    implementation(libs.material)
+    implementation(libs.constraintlayout)
+    implementation(libs.lifecycle.livedata.ktx)
+    implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.navigation.fragment)
+    implementation(libs.navigation.ui)
 
     // Graphing libraries
-    implementation(libs.androidplot.core) {
-        // http://halfhp.github.io/androidplot/docs/release_notes.html
-        // exclude group: 'com.android.support', module: 'support-annotations'
-    }
-
-    implementation libs.mpandroidchart   // https://github.com/PhilJay/MPAndroidChart/releases
+    implementation(libs.androidplot.core)
+    implementation(libs.mpandroidchart)
 
     // Support libs
-    implementation libs.converter.gson
-    implementation libs.android.joda
+    implementation(libs.converter.gson)
+    implementation(libs.android.joda)
+    implementation(libs.mapboxvectortile)
 
-    // Mapbox mvt
-    // https://github.com/wdtinc/mapbox-vector-tile-java/tree/readme_upgrade#
-    implementation  'com.wdtinc:mapbox-vector-tile:3.0.0'
+    testImplementation(libs.annotation)
+    testImplementation(libs.test.junit)
+    testImplementation(libs.test.assertj.core)
+    testImplementation(libs.test.robolectric)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.test.core)
+    testImplementation(libs.test.joda.time)
 
-
-    testImplementation libs.annotation
-    testImplementation libs.test.junit
-
-    androidTestImplementation libs.annotation
-    androidTestImplementation libs.test.ext.junit
-    androidTestImplementation libs.test.espresso.core
-
-    // Core library
-    androidTestImplementation libs.test.core
-    // AndroidJUnitRunner and JUnit Rules
-    androidTestImplementation libs.test.runner
-    androidTestImplementation libs.test.rules
-
-    // Assertions
-    androidTestImplementation libs.test.ext.junit
-    androidTestImplementation libs.test.truth
-    androidTestImplementation libs.test.google.truth
-    // androidTestImplementation libs.test.jmh.core
-    // androidTestImplementation libs.test.jmh.generator.annprocess
-
-    testImplementation libs.test.assertj.core
-    testImplementation libs.test.robolectric
-    testImplementation libs.mockito.core
-    testImplementation libs.test.core
-    testImplementation libs.test.joda.time
-
-    // testImplementation libs.test.jmh.core
-    // testImplementation libs.test.jmh.generator.annprocess
+    androidTestImplementation(libs.annotation)
+    androidTestImplementation(libs.test.ext.junit)
+    androidTestImplementation(libs.test.espresso.core)
+    androidTestImplementation(libs.test.core)
+    androidTestImplementation(libs.test.runner)
+    androidTestImplementation(libs.test.rules)
+    androidTestImplementation(libs.test.truth)
+    androidTestImplementation(libs.test.google.truth)
 }
