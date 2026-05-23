@@ -1,9 +1,9 @@
 /*
- * Copyright © 2024 The Weather Company. All rights reserved.
+ * Copyright (c) 2026 Dennis Lang (LanDen Labs) landenlabs@gmail.com
  */
 
 /*
- * Unpublished Work © 2020 Dennis Lang (LanDen Labs) landenlabs@gmail.com
+ * Unpublished Work © 2026Dennis Lang (LanDen Labs) landenlabs@gmail.com
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction, including
  * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell

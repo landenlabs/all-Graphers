@@ -1,6 +1,5 @@
 /*
- * IBM Confidential
- * Copyright IBM Corp. 2016, 2021. Copyright WSI Corporation 1998, 2015
+Copyright (c) 2026 Dennis Lang (LanDen Labs) landenlabs@gmail.com
  */
 
 package com.landenlabs.all_graphers.ui.logger;

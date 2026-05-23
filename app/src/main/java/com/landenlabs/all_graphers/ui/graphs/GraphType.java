@@ -1,6 +1,6 @@
 /*
  *
- * Copyright © 2024 The Weather Company. All rights reserved.
+ * Copyright (c) 2026 Dennis Lang (LanDen Labs) landenlabs@gmail.com
  *
  */
 
