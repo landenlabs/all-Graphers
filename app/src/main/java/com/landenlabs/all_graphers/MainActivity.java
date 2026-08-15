@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
         AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_YES);
 
-        App_TestJson1 testJson1 = new App_TestJson1(getApplicationContext());
-        testJson1.test1();
+        // App_TestJson1 testJson1 = new App_TestJson1(getApplicationContext());
+        // testJson1.test1();
     }
 }
