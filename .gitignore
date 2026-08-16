@@ -13,21 +13,14 @@ bin/
 gen/
 
 *.iml
-.gradle
-/local.properties
+.gradle/
 /.idea/
 
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
-
-# Gradle files
-.gradle/
 build/
-/*/build/
+captures/
+.externalNativeBuild/
+.cxx/
 
 # Local configuration file (sdk path, etc)
 local.properties
